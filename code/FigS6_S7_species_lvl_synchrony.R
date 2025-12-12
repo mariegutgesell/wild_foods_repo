@@ -30,6 +30,12 @@ avg_sync_coupling <- ggplot()+
   theme(axis.text.x = element_text(size = 12),axis.text.y = element_text(size = 12),axis.title.y=element_text(size = 14), axis.title.x = element_text(size = 14), text = element_text(family = "Avenir"), strip.background = element_blank())
 avg_sync_coupling
 
+seasonal_sync <- lm(synchrony_gross ~ sd_0_1, avg_df)
+summary(seasonal_sync)
+
+seasonal_sync_hab <- lm(synchrony_gross_habitat ~ sd_0_1, avg_df)
+summary(seasonal_sync_hab)
+
 avg_sync_diversity <- ggplot()+ 
   geom_point(data = avg_df, aes(x = sw_diversity, y = synchrony_gross), color = "brown3", size = 2) +
  # geom_smooth(data = avg_df, aes(x = sw_diversity, y = synchrony_gross), method = "lm", color = "brown3") +
@@ -43,7 +49,11 @@ avg_sync_diversity <- ggplot()+
   theme(axis.text.x = element_text(size = 12),axis.text.y = element_text(size = 12),axis.title.y=element_text(size = 14), axis.title.x = element_text(size = 14), text = element_text(family = "Avenir"), strip.background = element_blank())
 avg_sync_diversity
 
+seasonal_sync <- lm(synchrony_gross ~ sw_diversity, avg_df)
+summary(seasonal_sync)
 
+seasonal_sync_hab <- lm(synchrony_gross_habitat ~ sw_diversity, avg_df)
+summary(seasonal_sync_hab)
 
 
 avg_sync_cv <- ggplot()+ 
@@ -58,6 +68,10 @@ avg_sync_cv <- ggplot()+
   #  xlim(-3.7,-1.5)+
   theme(axis.text.x = element_text(size = 12),axis.text.y = element_text(size = 12),axis.title.y=element_text(size = 14), axis.title.x = element_text(size = 14), text = element_text(family = "Avenir"), strip.background = element_blank())
 avg_sync_cv
+
+seasonal_sync <- lm(harvest_total_cv ~ synchrony_gross, avg_df)
+summary(seasonal_sync)
+
 
 
 #####DECADAL SYNCHRONY ACROSS HABITAT ---------------
@@ -159,6 +173,13 @@ dec_sync_coupling <- ggplot()+
   theme(axis.text.x = element_text(size = 12),axis.text.y = element_text(size = 12),axis.title.y=element_text(size = 14), axis.title.x = element_text(size = 14), text = element_text(family = "Avenir"), strip.background = element_blank())
 dec_sync_coupling
 
+dec_sync <- lm(synchrony_gross ~ sd_0_1_mean, data = mean_hc_cv)
+summary(dec_sync)
+
+dec_sync_hab <- lm(synchrony_gross_habitat ~ sd_0_1_mean, data = mean_hc_cv)
+summary(dec_sync_hab)
+
+
 dec_sync_diversity <- ggplot()+ 
   geom_point(data = mean_hc_cv, aes(x = sw_diversity_mean, y = synchrony_gross), color = "brown3", size = 2) +
  # geom_smooth(data = mean_hc_cv, aes(x = sw_diversity_mean, y = synchrony_gross), method = "lm", color = "brown3") +
@@ -173,6 +194,11 @@ dec_sync_diversity <- ggplot()+
 
 dec_sync_diversity
 
+dec_sync <- lm(synchrony_gross ~ sw_diversity_mean, data = mean_hc_cv)
+summary(dec_sync)
+
+dec_sync_hab <- lm(synchrony_gross_habitat ~ sw_diversity_mean, data = mean_hc_cv)
+summary(dec_sync_hab)
 
 dec_sync_cv <- ggplot()+ 
   geom_point(data = mean_hc_cv, aes(y = cv_ph, x = synchrony_gross)) +
@@ -230,36 +256,6 @@ avg_decadal_synchrony_fig
 ggsave("figures/figure_S6.png", plot = avg_decadal_synchrony_fig)
 
 
-##stats 
-library(afex)
-library(performance)
-##average - seasonal CV
-seasonal_sync <- lm(harvest_total_cv ~ synchrony_gross, avg_df)
-summary(seasonal_sync)
-check_normality(seasonal_sync)
-plot(seasonal_sync_hab)
-
-##testing GAMs to deal with violated normality assumptions
-library(mgcv)
-seasonal_sync_hab <- lm(harvest_total_cv ~ synchrony_gross_habitat, avg_df)
-seasonal_sync_hab_gam <- gam(harvest_total_cv ~ s(synchrony_gross_habitat), data = avg_df, family = gaussian())
-summary(seasonal_sync_hab_gam)
-plot(seasonal_sync_hab_gam, shade = TRUE)
-gam.check(seasonal_sync_hab_gam)
-
-AIC(seasonal_sync_hab, seasonal_sync_hab_gam)
-##so in this case, GAM did nothing to improve fit of model, i have more than 30 obs. so based on central limit theorem coefficient estimates likely still valid and non-normally distributed residuals isn't a big issue
-##looking at homoscedasticity of residuals (scale-location plot) shows pretty flat line, so not an issue here
-##ordinary least squares regression okay in this case 
-
-##generalized linear model w/ gamma regression -- useful for skewed residuals
-seasonal_sync_hab_glm <- glm(harvest_total_cv ~ synchrony_gross_habitat, data = avg_df, family = Gamma(link = "log"))
-summary(seasonal_sync_hab_glm)
-AIC(seasonal_sync_hab, seasonal_sync_hab_glm)
-
-##does give the lowest AIC 
-
-hist(avg_df$harvest_total_cv)
 
 
 ##seasonal portfolio effect anovas 
@@ -293,34 +289,7 @@ check_normality(seasonal_pf_aov)
 
 
 
-##decadal CV 
-decadal_sync_sp <- lm(cv_ph ~ synchrony_gross, mean_hc_cv)
-summary(decadal_sync_sp)
-plot(decadal_sync_sp)
-
-decadal_sync_hab_gam <- gam(cv_ph ~ s(synchrony_gross), data = mean_hc_cv, family = gaussian())
-summary(decadal_sync_hab_gam)
-plot(decadal_sync_hab_gam, shade = TRUE)
-gam.check(decadal_sync_hab_gam)
-
-AIC(decadal_sync_hab, decadal_sync_hab_gam)
-
-
-decadal_sync_hab <- lm(cv_ph ~ synchrony_gross_habitat, mean_hc_cv)
-summary(decadal_sync_hab)
-plot(decadal_sync_hab)
-
-
-
-##generalized linear model w/ gamma regression -- useful for skewed residuals
-decadal_sync_hab_glm <- glm(cv_ph ~ synchrony_gross, data = mean_hc_cv, family = Gamma(link = "log"))
-summary(decadal_sync_hab_glm)
-AIC(decadal_sync_hab, decadal_sync_hab_glm)
-
-##does give the lowest AIC 
-
-
-##portfolio effect ANOVAs 
+##interannual portfolio effect ANOVAs 
 decadal_pf_df  <- harvest_cv_all %>%
   filter(time_type == "Decadal") 
 
@@ -342,41 +311,6 @@ decadal_pf_kw
 
 
 ##USING KW test as passed homogeneity of variance but failed normality test 
-
-
-###Comparing harvest structure to asynchrony 
-###Species-level, seasonal 
-avg_sync_g_coupling_lm_sp <- lm(synchrony_gross ~ sd_0_1, avg_df)
-summary(avg_sync_g_coupling_lm_sp)
-
-avg_sync_g_diversity_lm_sp <- lm(synchrony_gross ~ sw_diversity, avg_df)
-summary(avg_sync_g_diversity_lm_sp)
-
-
-##Species-level, decadal
-dec_sync_g_coupling_lm_sp <- lm(synchrony_gross ~ sd_0_1_mean, mean_hc_cv)
-summary(dec_sync_g_coupling_lm_sp)
-
-dec_sync_g_diversity_lm_sp <- lm(synchrony_gross ~ sw_diversity_mean, mean_hc_cv)
-summary(dec_sync_g_diversity_lm_sp)
-
-
-
-###Species-level, seasonal 
-avg_sync_g_coupling_lm_hab <- lm(synchrony_gross_habitat ~ sd_0_1, avg_df)
-summary(avg_sync_g_coupling_lm_hab)
-
-avg_sync_g_diversity_lm_hab <- lm(synchrony_gross_habitat ~ sw_diversity, avg_df)
-summary(avg_sync_g_diversity_lm_hab)
-
-
-##Species-level, decadal
-dec_sync_g_coupling_lm_hab <- lm(synchrony_gross_habitat ~ sd_0_1_mean, mean_hc_cv)
-summary(dec_sync_g_coupling_lm_hab)
-
-dec_sync_g_diversity_lm_hab <- lm(synchrony_gross_habitat ~ sw_diversity_mean, mean_hc_cv)
-summary(dec_sync_g_diversity_lm_hab)
-
 
 
 

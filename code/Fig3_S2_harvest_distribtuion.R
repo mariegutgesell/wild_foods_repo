@@ -167,5 +167,5 @@ fig_s2<- ggplot(total_harvest_rank, aes(x = harvest_rank_2, y= Percapita_Pounds_
   facet_wrap(~community_unique, scale = "free")
 fig_s2
 
-ggsave("figures/figure_S2.png", plot = ex2_fig_3)
+ggsave("figures/figure_S2.png", plot = fig_s2)
 

@@ -185,25 +185,24 @@ decadal_cv_diversity
 fig_5 <-  ggarrange(avg_cv_diversity, avg_cv_coupling, decadal_cv_diversity, decadal_cv_coupling,avg_robust_diversity, avg_robust_coupling, nrow = 3, ncol = 2, labels = c("i)", "ii)", "i)", "ii)", "i)", "ii)"), font.label = list(colour = "black", size = 14, family = "Avenir"))
 fig_5
 
-ggsave("figures/figure_5.png", plot = fig_5)
+#ggsave("figures/figure_5.png", plot = fig_5)
 ###4) REGRESSION ANALYSIS ------------
 avg_robust_div_lm <- lm(alpha ~ sw_diversity, avg_df)
-
 summary(avg_robust_div_lm)
 
-avg_robust_coupling_lm <- lm(alpha~ logit_sd_0_1, avg_df)
+avg_robust_coupling_lm <- lm(alpha~ sd_0_1, avg_df)
 summary(avg_robust_coupling_lm)
 
 avg_cv_div_lm <- lm(harvest_total_cv ~ sw_diversity, avg_df)
 summary(avg_cv_div_lm)
 
-avg_cv_coupling_lm <- lm(harvest_total_cv ~ logit_sd_0_1, avg_df)
+avg_cv_coupling_lm <- lm(harvest_total_cv ~ sd_0_1, avg_df)
 summary(avg_cv_coupling_lm)
 
 dec_cv_div_lm <- lm(cv_ph ~ sw_diversity_mean, mean_hc_cv)
 summary(dec_cv_div_lm)
 
-dec_cv_coupling_lm <- lm(cv_ph ~ logit_sd_0_1_mean, mean_hc_cv)
+dec_cv_coupling_lm <- lm(cv_ph ~ sd_0_1_mean, mean_hc_cv)
 summary(dec_cv_coupling_lm)
 
 
@@ -277,7 +276,7 @@ decadal_cv_evenness <- ggplot(mean_hc_cv, aes(x = evenness_mean, y = cv_ph)) +
   theme(axis.text.x = element_text(size = 12),axis.text.y = element_text(size = 12),axis.title.y=element_text(size = 14), axis.title.x = element_text(size = 14), text = element_text(family = "Avenir"), strip.background = element_blank())
 decadal_cv_evenness
 
-supp_fig_S5 <-  ggarrange(avg_robust_richness, avg_robust_evenness, avg_cv_richness, avg_cv_evenness, decadal_cv_richness, decadal_cv_evenness, nrow = 3, ncol = 2, labels = c("i)", "ii)", "i)", "ii)", "i)", "ii)"), font.label = list(colour = "black", size = 14, family = "Avenir"))
+supp_fig_S5 <-  ggarrange(avg_cv_richness, avg_cv_evenness, decadal_cv_richness, decadal_cv_evenness, avg_robust_richness, avg_robust_evenness, nrow = 3, ncol = 2, labels = c("i)", "ii)", "i)", "ii)", "i)", "ii)"), font.label = list(colour = "black", size = 14, family = "Avenir"))
 supp_fig_S5
 
 ggsave("figures/figure_S5.png", plot = supp_fig_S5)

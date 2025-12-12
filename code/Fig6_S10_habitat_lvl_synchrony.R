@@ -120,7 +120,7 @@ dec_sync_g_cv_lm <- lm(cv_ph ~ synchrony_gross, mean_hc_cv)
 summary(dec_sync_g_cv_lm)
 
 dec_sync_l_cv_lm <- lm(cv_ph ~ synchrony_loreau, mean_hc_cv)
-summary(avg_sync_l_cv_lm)
+summary(dec_sync_l_cv_lm)
 
 ###GROSS SYNCHRONY FIG -- DECADAL AND AVERAGE SYNCHRONY VS CV and Portfolio effect boxplots
 source("code/habitat_lvl_portfolio_effect_boxplot.R")
@@ -163,36 +163,6 @@ ggsave("figures/figure_6.png", avg_decadal_synchrony_fig_2)
 
 
 ###Statistical Tests ----- 
-library(afex)
-library(performance)
-##Average Harvest - seasonal CV vs. Synchrony
-seasonal_sync_hab <- lm(harvest_total_cv ~ synchrony_gross_habitat, avg_df)
-summary(seasonal_sync_hab)
-check_normality(seasonal_sync_hab)
-plot(seasonal_sync_hab)
-
-##testing GAMs to deal with violated normality assumptions
-library(mgcv)
-seasonal_sync_hab <- lm(harvest_total_cv ~ synchrony_gross_habitat, avg_df)
-seasonal_sync_hab_gam <- gam(harvest_total_cv ~ s(synchrony_gross_habitat), data = avg_df, family = gaussian())
-summary(seasonal_sync_hab_gam)
-plot(seasonal_sync_hab_gam, shade = TRUE)
-gam.check(seasonal_sync_hab_gam)
-
-AIC(seasonal_sync_hab, seasonal_sync_hab_gam)
-##so in this case, GAM did nothing to improve fit of model, i have more than 30 obs. so based on central limit theorem coefficient estimates likely still valid and non-normally distributed residuals isn't a big issue
-##looking at homoscedasticity of residuals (scale-location plot) shows pretty flat line, so not an issue here
-##ordinary least squares regression okay in this case 
-
-##generalized linear model w/ gamma regression -- useful for skewed residuals
-seasonal_sync_hab_glm <- glm(harvest_total_cv ~ synchrony_gross_habitat, data = avg_df, family = Gamma(link = "log"))
-summary(seasonal_sync_hab_glm)
-AIC(seasonal_sync_hab, seasonal_sync_hab_glm)
-
-##does give the lowest AIC 
-
-hist(avg_df$harvest_total_cv)
-
 
 ##seasonal portfolio effect anovas 
 library(car)
@@ -222,27 +192,6 @@ check_homogeneity(seasonal_pf_aov)
 check_normality(seasonal_pf_aov)
 
 ##log transformation does not increase normality/difference in variances b/w groups 
-
-
-
-##Interannual Harvest CV vs. Synchrony 
-decadal_sync_hab <- lm(cv_ph ~ synchrony_gross, mean_hc_cv)
-summary(decadal_sync_hab)
-plot(decadal_sync_hab)
-
-decadal_sync_hab_gam <- gam(cv_ph ~ s(synchrony_gross), data = mean_hc_cv, family = gaussian())
-summary(decadal_sync_hab_gam)
-plot(decadal_sync_hab_gam, shade = TRUE)
-gam.check(decadal_sync_hab_gam)
-
-AIC(decadal_sync_hab, decadal_sync_hab_gam)
-
-##generalized linear model w/ gamma regression -- useful for skewed residuals
-decadal_sync_hab_glm <- glm(cv_ph ~ synchrony_gross, data = mean_hc_cv, family = Gamma(link = "log"))
-summary(decadal_sync_hab_glm)
-AIC(decadal_sync_hab, decadal_sync_hab_glm)
-
-##does give the lowest AIC 
 
 
 ##portfolio effect ANOVAs 

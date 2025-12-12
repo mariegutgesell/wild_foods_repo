@@ -77,7 +77,7 @@ fig_S8
 ggsave("figures/figure_S8.png", plot = fig_S8)
 ##Regressions
 
-lm_coupling <- lm(slope_mean ~ logit_sd_0_1, avg_df)
+lm_coupling <- lm(slope_mean ~ sd_0_1, avg_df)
 summary(lm_coupling)
 
 
